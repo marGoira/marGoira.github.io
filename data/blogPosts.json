@@ -67,6 +67,48 @@
         }
       ],
       "tags": ["anotherpost", "petproject", "developer","nelepeecee", "icehockey","winteriscoming","tampereenilves","tampereendynamo"]
+    },
+    {
+      "id": 3,
+      "title": "Pet project",
+      "date": "2025-11-08",
+      "author": "margoira",
+      "summary": "Lets talk about my pet project",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Tomorrow on 9th November, it is father's day here in Finland. So happy father's day to all dads out there! Let's see what tomorrow brings for me."
+        },
+        {
+          "type": "paragraph",
+          "text": "I mentioned my pet project in my last post. I will call it 'MakeHumanStrongAgain', I don't want to use real name of it yet. I have been working one important feature, which is very important if we think the big picture. Lets talk about it little bit."
+        },
+        {
+          "type": "paragraph",
+          "text": "To understand this puzzle, I need to explain little bit how this idea works. The main idea is that user creates an account to this web service, and in summary, the user adds exercises/activities for himself/herself. These activities has certain amount of points, so user will get points and level up own character with real life activities. "
+        },
+        {
+          "type": "paragraph",
+          "text": "These activities can be for example: go to gym and bench 100kg, run 5km in 25minutes, score 2 goals in a hockey game etc. So user level up own character with real life activities....ok, but why?....Well, the idea is to get people to do more exercises and be much more active in real life. And because this is game, what would be a better 'carrot' than competing agains other users? So there is also Leaderboard, where users can see how they rank againts others. Different seasons and tasks which will give extra points."
+        },
+        {
+          "type": "paragraph",
+          "text": "What is the puzzle or feature which I mentioned earlier?...It is called exercise review. If user adds an exercise, the exercise will have status 'not verified'. User will get the 'verified' status, when there is evidence that user has done that activity in real life. Evidence can be for example: photo, video, data from fitness app, social media post etc. This kind of verification needs a lot of attention from admin, because it is kind of manual work. There needs to be a better way to do this."
+        },
+        {
+          "type": "paragraph",
+          "text": "If admin can only verify these activities, it will be bullet proof. But I don't want to spend my time to do this...One idea is to use peer review by other users. There could be some kind of upvote/downvote logic and comments. But this could be also abused? There could be somekind of groups, where high level users could verify these activities. But how to avoid favourite treatment or reverse?....One another way would be task AI to handle this verification. AI could analyze the evidense and users exercise history. AI could also recommend verified activities to admin for faster verification, I don't know...Lots of things to think about."
+        },
+        {
+          "type": "paragraph",
+          "text": "This kind of feature is important, because if it is implemented badly, it could ruin the mood of the whole game. If users feel that verification is unfair or too hard, they will quit using the service. If I get partners for this project (sport clubs, gyms etc.) there would be real rewards for users, then this needs to be bullet proof."
+        },
+        {
+          "type": "paragraph",
+          "text": "I will tell more about the solution when I have something concrete. Also fixed little style issues and added little pulse animation to logo."
+        }
+      ],
+      "tags": ["third", "petproject", "developer","makehumanstrongagain", "sportlife","game","anyideas","fathersday" ]
     }
   ]
 }

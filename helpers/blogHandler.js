@@ -1,4 +1,3 @@
-// helpers/blogHandler.js
 class BlogHandler {
     constructor() {
         this.postsContainer = document.getElementById('posts-container');

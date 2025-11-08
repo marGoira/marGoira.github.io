@@ -215,7 +215,6 @@ main {
 
 .posts-container .post .hero-text {
     background-color: rgba(31, 31, 82, 0.6);
-    padding: 1.6rem;
     border-radius: 10px;
     max-width: 600px;
     margin: 1.6rem auto;
@@ -229,6 +228,16 @@ main {
 
 .posts-container .post .hero-text .post-content {
     text-align: left;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.logo {
+  animation: pulse 2s infinite;
 }
 
 @media (max-width: 700px) {
