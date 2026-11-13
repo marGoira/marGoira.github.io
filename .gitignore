@@ -1,0 +1,23 @@
+# Node / Vite
+node_modules/
+web/dist/
+web/.env.local
+web/.env.*.local
+
+# .NET / Functions
+api/bin/
+api/obj/
+api/local.settings.json
+
+# Terraform
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/terraform.tfvars
+infra/.terraform.lock.hcl.bak
+
+# Muut
+.DS_Store
+*.log
+.vscode/*
+!.vscode/extensions.json

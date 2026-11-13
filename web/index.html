@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#07080f">
+  <link rel="icon" href="data:,">
+  <title>Kantama</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>KANTAMA<small>Tutki, päivitä, lennä pidemmälle.</small></h1>
+    <div class="res">
+      <div class="chip" title="Krediitit: käytetään telakalla"><span>KR</span><b id="cr">0</b></div>
+      <div class="chip tp" title="Tutkimuspisteet: käytetään tutkimukseen"><span>TP</span><b id="tp">0</b></div>
+      <div class="chip" title="Aluksesi kantama"><span>KANTAMA</span><b id="rng">2</b></div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="map" aria-selected="true">Tähtikartta</button>
+    <button class="tab" role="tab" data-tab="tech" aria-selected="false">Tutkimus</button>
+    <button class="tab" role="tab" data-tab="yard" aria-selected="false">Telakka</button>
+  </nav>
+
+  <section id="view-map">
+    <div class="split">
+      <div>
+        <div class="screen"><canvas id="mapc" width="320" height="200" aria-label="Tähtikartta: napauta kohdetta"></canvas></div>
+        <div class="dests" id="dests"></div>
+      </div>
+      <div class="panel" id="destPanel"></div>
+    </div>
+  </section>
+
+  <section id="view-tech" hidden>
+    <div class="stack">
+      <p class="lead">Tutkimuspisteitä (TP) saa jokaisesta onnistuneesta laskeutumisesta. Uusi teknologia muuttaa aluksen fysiikkaa: suurempi kantama vie kauemmas, parempi polttoaine kestää pidempään laskeutumisessa.</p>
+      <div class="tree" id="tree"></div>
+    </div>
+  </section>
+
+  <section id="view-yard" hidden>
+    <div class="yard">
+      <canvas id="shipc" width="24" height="24" aria-label="Aluksesi"></canvas>
+      <div class="stack">
+        <div class="panel">
+          <h2 id="yardName">Kipinä</h2>
+          <dl class="kv" id="yardStats"></dl>
+        </div>
+        <div class="panel">
+          <span class="label">Runkoluokat (krediiteillä)</span>
+          <div class="hulls" id="hulls"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-orbit" class="playview" hidden>
+    <div class="landwrap">
+      <div class="landbar">
+        <span id="orbitTitle" class="label">Matkalento</span>
+        <button class="btn ghost" id="orbitAbort">Hinaa kotiin</button>
+      </div>
+      <div class="screen">
+        <canvas id="orbitc" width="320" height="200"></canvas>
+        <div class="hud" id="orbitHud"></div>
+        <div class="result" id="orbitResult" hidden></div>
+      </div>
+      <div class="controls">
+        <button class="ctl" id="oL" aria-label="Käännä vasemmalle">◀</button>
+        <button class="ctl" id="oR" aria-label="Käännä oikealle">▶</button>
+        <button class="ctl" id="oT">MOOTTORI</button>
+      </div>
+      <div class="controls five">
+        <button class="ctl small" id="oPro" title="Käännä menosuuntaan">MYÖTÄ</button>
+        <button class="ctl small" id="oRetro" title="Käännä vastasuuntaan">VASTA</button>
+        <button class="ctl small" id="oWarp" title="Aikakiihdytys">AIKA ×1</button>
+        <button class="ctl small" id="oZoomOut" aria-label="Loitonna">−</button>
+        <button class="ctl small" id="oZoomIn" aria-label="Lähennä">+</button>
+      </div>
+      <p class="hint center">Polta myötäsuuntaan nostaaksesi rataa ja vastasuuntaan laskeaksesi sitä. Saavu kohteen katkoviivaympyrään hitaasti, niin alus jää kiertoradalle.</p>
+    </div>
+  </section>
+
+  <section id="view-land" class="playview" hidden>
+    <div class="landwrap">
+      <div class="landbar">
+        <span id="landTitle" class="label">Laskeutuminen</span>
+        <button class="btn ghost" id="abort">Keskeytä</button>
+      </div>
+      <div class="screen">
+        <canvas id="landc" width="320" height="200"></canvas>
+        <div class="hud" id="hud"></div>
+        <div class="result" id="result" hidden></div>
+      </div>
+      <div class="controls">
+        <button class="ctl" id="cL" aria-label="Käännä vasemmalle">◀</button>
+        <button class="ctl" id="cR" aria-label="Käännä oikealle">▶</button>
+        <button class="ctl" id="cT">MOOTTORI</button>
+      </div>
+      <p class="hint center">Näppäimistö: ← → kääntää, ↑ tai välilyönti polttaa moottoria. Laskeudu tasaiselle alustalle hitaasti ja pystyssä.</p>
+    </div>
+  </section>
+
+  <footer>
+    <label class="toggle"><input type="checkbox" id="easy"> Helppo tila (lempeämpi painovoima, vakain ja autopilotti päällä)</label>
+    <span class="hint" id="syncStatus"></span>
+    <button class="btn ghost" id="reset">Aloita alusta</button>
+  </footer>
+</div>
+<div id="toast" hidden></div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
