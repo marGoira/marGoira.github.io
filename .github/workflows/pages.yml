@@ -1,6 +1,6 @@
-# Julkaisee pelin GitHub Pagesiin aina, kun main-haaraan tulee muutos.
-# Käyttöönotto: repon Settings → Pages → Source: "GitHub Actions".
-name: Julkaise GitHub Pagesiin
+# Publishes the game to GitHub Pages whenever the main branch changes.
+# Setup: repo Settings → Pages → Source: "GitHub Actions".
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -30,8 +30,8 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
-      # Pilvitallennus pois päältä: peli tallentaa selaimeen.
-      # Kun API on pilvessä, lisää repon Variables-osioon VITE_API_URL.
+      # Cloud save off: the game saves to the browser.
+      # Once the API is in the cloud, add VITE_API_URL to the repo's Variables.
       - run: npm run build
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}

@@ -1,6 +1,6 @@
 /**
- * Syöte: näppäimistö + kosketusnapit samaan tilaan.
- * Napit estävät iOS Safarin pitkän painalluksen valikon ja tekstinvalinnan.
+ * Input: keyboard and touch buttons feed the same state.
+ * Buttons suppress the iOS Safari long-press menu and text selection.
  */
 export type Action = "left" | "right" | "thrust" | "pro" | "retro";
 
@@ -14,7 +14,7 @@ const KEYMAP: Record<string, Action> = {
 };
 
 let enabled = false;
-/** Pelinäkymät kytkevät näppäimistön päälle; valikoissa välilyönti saa toimia normaalisti. */
+/** Gameplay views turn the keyboard on; in menus Space keeps its normal behaviour. */
 export function setKeyboardEnabled(on: boolean): void {
   enabled = on;
   if (!on) resetInput();
@@ -26,7 +26,7 @@ export function resetInput(): void {
 }
 
 const keyHandlers: ((code: string) => void)[] = [];
-/** Kertapainallukset (esim. Esc, aikakiihdytys). */
+/** Single key presses (e.g. Esc, time warp). */
 export function onKey(fn: (code: string) => void): void {
   keyHandlers.push(fn);
 }
@@ -42,13 +42,13 @@ addEventListener("keyup", (e) => {
   if (a) input[a] = false;
 });
 
-/** Pidettävä nappi (moottori, kääntö). */
+/** Hold-down button (engine, turning). */
 export function bindHold(el: HTMLElement, action: Action): void {
   const on = (e: PointerEvent) => {
     e.preventDefault();
     input[action] = true;
     el.classList.add("on");
-    try { el.setPointerCapture(e.pointerId); } catch { /* vanhat selaimet */ }
+    try { el.setPointerCapture(e.pointerId); } catch { /* old browsers */ }
   };
   const off = () => { input[action] = false; el.classList.remove("on"); };
   el.addEventListener("pointerdown", on);
@@ -58,7 +58,7 @@ export function bindHold(el: HTMLElement, action: Action): void {
   suppressTouchMenus(el);
 }
 
-/** Napautettava nappi pelinäkymässä (ei klikkiviivettä, ei valikkoa). */
+/** Tap button in a gameplay view (no click delay, no menu). */
 export function bindTap(el: HTMLElement, fn: () => void): void {
   el.addEventListener("pointerdown", (e) => { e.preventDefault(); fn(); });
   suppressTouchMenus(el);

@@ -1,17 +1,17 @@
-/** Runkoluokat ja niiden pikseligrafiikka. Jokainen merkki on yksi pikseli, '.' on tyhjä. */
+/** Hull classes and their pixel art. Each character is one pixel, '.' is empty. */
 export interface Hull {
   name: string;
   cost: number;
 }
 
 export const HULLS: Hull[] = [
-  { name: "Kipinä", cost: 0 },
-  { name: "Komeetta", cost: 150 },
+  { name: "Spark", cost: 0 },
+  { name: "Comet", cost: 150 },
   { name: "Nova", cost: 400 },
-  { name: "Pulsari", cost: 900 },
+  { name: "Pulsar", cost: 900 },
 ];
 
-/** 9 × 8 pikseliä. Keskipiste (4.5, 4), jalat alarivillä. */
+/** 9 × 8 pixels. Centre (4.5, 4), landing legs on the bottom row. */
 export const SPRITES: string[][] = [
   ["....W....", "...WWW...", "...WBW...", "..WWWWW..", "..WWWWW..", "..RWWWR..", ".RR...RR.", ".R.....R."],
   ["....R....", "...WWW...", "...WBW...", "..WWWWW..", ".RWWBWWR.", ".RWWWWWR.", ".R.DDD.R.", "R.......R"],

@@ -11,7 +11,7 @@ output "static_web_app_name" {
 }
 
 output "swa_deployment_token" {
-  description = "Static Web Appin julkaisutunnus (terraform output -raw swa_deployment_token)"
+  description = "Static Web App deployment token (terraform output -raw swa_deployment_token)"
   value       = azurerm_static_web_app.web.api_key
   sensitive   = true
 }
@@ -21,7 +21,7 @@ output "function_app_name" {
 }
 
 output "api_url" {
-  description = "Aseta tämä web/.env.production -tiedostoon muuttujaksi VITE_API_URL"
+  description = "Set this as VITE_API_URL in web/.env.production"
   value       = "https://${azurerm_function_app_flex_consumption.api.default_hostname}/api"
 }
 

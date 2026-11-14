@@ -5,8 +5,8 @@ using Microsoft.Extensions.Configuration;
 namespace Kantama.Api.Storage;
 
 /// <summary>
-/// Pelitallennukset Azure Table Storagessa: PartitionKey = pelaajan id, RowKey = "save".
-/// Tallennuksen JSON säilytetään sellaisenaan, joten pelin tilaan voi lisätä kenttiä ilman API-muutoksia.
+/// Game saves in Azure Table Storage: PartitionKey = player id, RowKey = "save".
+/// The save JSON is stored as is, so fields can be added to the game state without API changes.
 /// </summary>
 public sealed class SaveRepository
 {
@@ -35,7 +35,7 @@ public sealed class SaveRepository
         return new SaveRecord(e.GetString("Data") ?? "{}", e.GetString("UpdatedAt") ?? "");
     }
 
-    /// <summary>Tallentaa, ellei pilvessä ole jo uudempaa versiota. Palauttaa false, jos tallennus hylättiin.</summary>
+    /// <summary>Saves unless the cloud already has a newer version. Returns false if the save was rejected.</summary>
     public async Task<bool> UpsertAsync(string playerId, string json, string updatedAt, CancellationToken ct)
     {
         await EnsureTableAsync(ct);
@@ -49,7 +49,7 @@ public sealed class SaveRepository
         if (existing.HasValue && existing.Value is not null)
         {
             var storedAt = existing.Value.GetString("UpdatedAt") ?? "";
-            // ISO 8601 -aikaleimat vertautuvat oikein merkkijonoina
+            // ISO 8601 timestamps compare correctly as strings
             if (string.CompareOrdinal(storedAt, updatedAt) > 0) return false;
             try
             {
@@ -57,7 +57,7 @@ public sealed class SaveRepository
             }
             catch (RequestFailedException ex) when (ex.Status == 412)
             {
-                return false; // toinen laite ehti väliin
+                return false; // another device got there first
             }
             return true;
         }

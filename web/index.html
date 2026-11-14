@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fi">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -13,24 +13,24 @@
 <body>
 <div class="app">
   <header>
-    <h1>KANTAMA<small>Tutki, päivitä, lennä pidemmälle.</small></h1>
+    <h1>KANTAMA<small>Explore, upgrade, fly further.</small></h1>
     <div class="res">
-      <div class="chip" title="Krediitit: käytetään telakalla"><span>KR</span><b id="cr">0</b></div>
-      <div class="chip tp" title="Tutkimuspisteet: käytetään tutkimukseen"><span>TP</span><b id="tp">0</b></div>
-      <div class="chip" title="Aluksesi kantama"><span>KANTAMA</span><b id="rng">2</b></div>
+      <div class="chip" title="Credits: spent at the shipyard"><span>CR</span><b id="cr">0</b></div>
+      <div class="chip tp" title="Research points: spent on research"><span>RP</span><b id="tp">0</b></div>
+      <div class="chip" title="Your ship's range"><span>RANGE</span><b id="rng">2</b></div>
     </div>
   </header>
 
   <nav class="tabs" id="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="map" aria-selected="true">Tähtikartta</button>
-    <button class="tab" role="tab" data-tab="tech" aria-selected="false">Tutkimus</button>
-    <button class="tab" role="tab" data-tab="yard" aria-selected="false">Telakka</button>
+    <button class="tab" role="tab" data-tab="map" aria-selected="true">Star map</button>
+    <button class="tab" role="tab" data-tab="tech" aria-selected="false">Research</button>
+    <button class="tab" role="tab" data-tab="yard" aria-selected="false">Shipyard</button>
   </nav>
 
   <section id="view-map">
     <div class="split">
       <div>
-        <div class="screen"><canvas id="mapc" width="320" height="200" aria-label="Tähtikartta: napauta kohdetta"></canvas></div>
+        <div class="screen"><canvas id="mapc" width="320" height="200" aria-label="Star map: tap a destination"></canvas></div>
         <div class="dests" id="dests"></div>
       </div>
       <div class="panel" id="destPanel"></div>
@@ -39,21 +39,21 @@
 
   <section id="view-tech" hidden>
     <div class="stack">
-      <p class="lead">Tutkimuspisteitä (TP) saa jokaisesta onnistuneesta laskeutumisesta. Uusi teknologia muuttaa aluksen fysiikkaa: suurempi kantama vie kauemmas, parempi polttoaine kestää pidempään laskeutumisessa.</p>
+      <p class="lead">You earn research points (RP) from every successful landing. New technology changes your ship's physics: more range takes you further, better fuel lasts longer during landing.</p>
       <div class="tree" id="tree"></div>
     </div>
   </section>
 
   <section id="view-yard" hidden>
     <div class="yard">
-      <canvas id="shipc" width="24" height="24" aria-label="Aluksesi"></canvas>
+      <canvas id="shipc" width="24" height="24" aria-label="Your ship"></canvas>
       <div class="stack">
         <div class="panel">
-          <h2 id="yardName">Kipinä</h2>
+          <h2 id="yardName">Spark</h2>
           <dl class="kv" id="yardStats"></dl>
         </div>
         <div class="panel">
-          <span class="label">Runkoluokat (krediiteillä)</span>
+          <span class="label">Hull classes (bought with credits)</span>
           <div class="hulls" id="hulls"></div>
         </div>
       </div>
@@ -63,8 +63,8 @@
   <section id="view-orbit" class="playview" hidden>
     <div class="landwrap">
       <div class="landbar">
-        <span id="orbitTitle" class="label">Matkalento</span>
-        <button class="btn ghost" id="orbitAbort">Hinaa kotiin</button>
+        <span id="orbitTitle" class="label">Transfer flight</span>
+        <button class="btn ghost" id="orbitAbort">Tow home</button>
       </div>
       <div class="screen">
         <canvas id="orbitc" width="320" height="200"></canvas>
@@ -72,26 +72,26 @@
         <div class="result" id="orbitResult" hidden></div>
       </div>
       <div class="controls">
-        <button class="ctl" id="oL" aria-label="Käännä vasemmalle">◀</button>
-        <button class="ctl" id="oR" aria-label="Käännä oikealle">▶</button>
-        <button class="ctl" id="oT">MOOTTORI</button>
+        <button class="ctl" id="oL" aria-label="Turn left">◀</button>
+        <button class="ctl" id="oR" aria-label="Turn right">▶</button>
+        <button class="ctl" id="oT">ENGINE</button>
       </div>
       <div class="controls five">
-        <button class="ctl small" id="oPro" title="Käännä menosuuntaan">MYÖTÄ</button>
-        <button class="ctl small" id="oRetro" title="Käännä vastasuuntaan">VASTA</button>
-        <button class="ctl small" id="oWarp" title="Aikakiihdytys">AIKA ×1</button>
-        <button class="ctl small" id="oZoomOut" aria-label="Loitonna">−</button>
-        <button class="ctl small" id="oZoomIn" aria-label="Lähennä">+</button>
+        <button class="ctl small" id="oPro" title="Point along your direction of travel">PROGRADE</button>
+        <button class="ctl small" id="oRetro" title="Point against your direction of travel">RETRO</button>
+        <button class="ctl small" id="oWarp" title="Time warp">TIME ×1</button>
+        <button class="ctl small" id="oZoomOut" aria-label="Zoom out">−</button>
+        <button class="ctl small" id="oZoomIn" aria-label="Zoom in">+</button>
       </div>
-      <p class="hint center">Polta myötäsuuntaan nostaaksesi rataa ja vastasuuntaan laskeaksesi sitä. Saavu kohteen katkoviivaympyrään hitaasti, niin alus jää kiertoradalle.</p>
+      <p class="hint center">Burn prograde to raise your orbit and retrograde to lower it. Enter the target's dashed circle slowly and the ship will be captured into orbit.</p>
     </div>
   </section>
 
   <section id="view-land" class="playview" hidden>
     <div class="landwrap">
       <div class="landbar">
-        <span id="landTitle" class="label">Laskeutuminen</span>
-        <button class="btn ghost" id="abort">Keskeytä</button>
+        <span id="landTitle" class="label">Landing</span>
+        <button class="btn ghost" id="abort">Abort</button>
       </div>
       <div class="screen">
         <canvas id="landc" width="320" height="200"></canvas>
@@ -99,18 +99,18 @@
         <div class="result" id="result" hidden></div>
       </div>
       <div class="controls">
-        <button class="ctl" id="cL" aria-label="Käännä vasemmalle">◀</button>
-        <button class="ctl" id="cR" aria-label="Käännä oikealle">▶</button>
-        <button class="ctl" id="cT">MOOTTORI</button>
+        <button class="ctl" id="cL" aria-label="Turn left">◀</button>
+        <button class="ctl" id="cR" aria-label="Turn right">▶</button>
+        <button class="ctl" id="cT">ENGINE</button>
       </div>
-      <p class="hint center">Näppäimistö: ← → kääntää, ↑ tai välilyönti polttaa moottoria. Laskeudu tasaiselle alustalle hitaasti ja pystyssä.</p>
+      <p class="hint center">Keyboard: ← → to turn, ↑ or Space to fire the engine. Land on a flat pad slowly and upright.</p>
     </div>
   </section>
 
   <footer>
-    <label class="toggle"><input type="checkbox" id="easy"> Helppo tila (lempeämpi painovoima, vakain ja autopilotti päällä)</label>
+    <label class="toggle"><input type="checkbox" id="easy"> Easy mode (gentler gravity, stabilizer and autopilot on)</label>
     <span class="hint" id="syncStatus"></span>
-    <button class="btn ghost" id="reset">Aloita alusta</button>
+    <button class="btn ghost" id="reset">Start over</button>
   </footer>
 </div>
 <div id="toast" hidden></div>

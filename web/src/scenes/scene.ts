@@ -1,4 +1,4 @@
-/** Yhteinen rajapinta pelinäkymille. main.ts kutsuu aktiivisen näkymän update/draw-metodeja. */
+/** Shared interface for gameplay views. main.ts calls update/draw on the active view. */
 export interface Scene {
   update(dt: number): void;
   draw(): void;
@@ -12,7 +12,7 @@ export interface ResultButton {
 
 export interface Particle { x: number; y: number; vx: number; vy: number; life: number; c: string; g?: number }
 
-/** Näyttää tulospaneelin pelin päällä. */
+/** Shows a result panel on top of the game. */
 export function showResult(el: HTMLElement, html: string, buttons: ResultButton[]): void {
   el.innerHTML = `<div class="panel">${html}<div class="btnrow"></div></div>`;
   const row = el.querySelector(".btnrow")!;

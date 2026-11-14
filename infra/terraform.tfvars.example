@@ -1,4 +1,4 @@
-# Kopioi tiedostoksi terraform.tfvars (ei mene gittiin)
+# Copy to terraform.tfvars (not committed to git)
 subscription_id = "00000000-0000-0000-0000-000000000000"
 environment     = "dev"
 location        = "northeurope"

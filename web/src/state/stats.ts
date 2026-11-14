@@ -1,20 +1,20 @@
-/** Aluksen ominaisuudet lasketaan aina tilasta: runko + tutkitut teknologiat. */
+/** Ship stats are always derived from the state: hull + researched technologies. */
 import type { Planet } from "../data/planets";
 import { state } from "./gameState";
 
-/** Laskeutumisen pikseliskaala: 1 m/s² = 6 px/s² */
+/** Landing pixel scale: 1 m/s² = 6 px/s² */
 export const G_SCALE = 6;
 
 export interface ShipStats {
-  /** Laskeutumismoottorin kiihtyvyys px/s² */
+  /** Landing engine acceleration, px/s² */
   thrust: number;
-  /** Laskeutumistankki */
+  /** Landing fuel tank */
   tank: number;
-  /** Kulutus yks./s */
+  /** Consumption, units/s */
   burn: number;
-  /** Matkakantama: kerrotaan matkalennon delta-v-budjetiksi */
+  /** Travel range: multiplied into the transfer flight's delta-v budget */
   range: number;
-  /** Kääntönopeus rad/s */
+  /** Turn rate, rad/s */
   turn: number;
   predictor: boolean;
   oberth: boolean;
@@ -46,12 +46,12 @@ export function stats(): ShipStats {
   };
 }
 
-/** Autopilotin vaatima kantama (Oberth-tekniikka pienentää). */
+/** Range the autopilot needs (reduced by the Oberth Effect). */
 export const autopilotCost = (p: Planet) => +(p.dist * (stats().oberth ? 0.75 : 1)).toFixed(2);
 
 export const isUnlocked = (p: Planet) => !p.wormhole || stats().wormhole;
 
-/** Riittääkö kantama autopilotille. */
+/** Whether the range is enough for the autopilot. */
 export const autopilotReach = (p: Planet) => isUnlocked(p) && autopilotCost(p) <= stats().range + 1e-6;
 
 export const planetName = (p: Planet) => (p.id === "exo" && state.exoName ? state.exoName : p.name);
@@ -64,8 +64,8 @@ export function flameColor(): string {
 }
 
 export function engineName(): string {
-  if (has("p4")) return "antimateria";
-  if (has("m3")) return "fuusio";
-  if (has("m2")) return "ionit";
-  return "kemiallinen";
+  if (has("p4")) return "antimatter";
+  if (has("m3")) return "fusion";
+  if (has("m2")) return "ion";
+  return "chemical";
 }

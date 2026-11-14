@@ -1,6 +1,6 @@
 /**
- * Sovelluksen käynnistys: näkymien vaihto, pelisilmukka ja nappien kytkentä.
- * Näkymät: map / tech / yard (valikot) ja orbit / land (pelinäkymät).
+ * App startup: view switching, the game loop and button wiring.
+ * Views: map / tech / yard (menus) and orbit / land (gameplay views).
  */
 import "./style.css";
 import { $, fmt, fmt1, toast } from "./core/util";
@@ -50,7 +50,7 @@ function show(v: View): void {
   refreshHeader();
 }
 
-/* ---- napit ---- */
+/* ---- buttons ---- */
 document.querySelectorAll<HTMLElement>(".tab").forEach((b) => (b.onclick = () => show(b.dataset.tab as View)));
 
 bindHold($("cL"), "left"); bindHold($("cR"), "right"); bindHold($("cT"), "thrust");
@@ -74,7 +74,7 @@ onKey((code) => {
   }
 });
 
-// iOS: estä tekstinvalinta pelinäkymissä
+// iOS: prevent text selection in gameplay views
 document.addEventListener("selectionchange", () => {
   if (view === "orbit" || view === "land") window.getSelection()?.removeAllRanges();
 });
@@ -83,7 +83,7 @@ const easy = $<HTMLInputElement>("easy");
 easy.onchange = () => {
   commit((s) => { s.easy = easy.checked; });
   if (view === "map") map.render();
-  toast(state.easy ? "Helppo tila päällä: kevyempi painovoima, isommat alustat, enemmän polttoainetta." : "Helppo tila pois.");
+  toast(state.easy ? "Easy mode on: lighter gravity, bigger pads, more fuel." : "Easy mode off.");
 };
 
 let resetArm = 0;
@@ -94,19 +94,19 @@ resetBtn.onclick = () => {
     easy.checked = false;
     map.selected = "moon";
     show("map");
-    resetBtn.textContent = "Aloita alusta";
+    resetBtn.textContent = "Start over";
     resetArm = 0;
-    toast("Uusi ura alkoi.");
+    toast("A new career has begun.");
     return;
   }
   resetArm = Date.now();
-  resetBtn.textContent = "Paina uudelleen vahvistaaksesi";
-  window.setTimeout(() => { if (Date.now() - resetArm >= 3000) resetBtn.textContent = "Aloita alusta"; }, 3100);
+  resetBtn.textContent = "Press again to confirm";
+  window.setTimeout(() => { if (Date.now() - resetArm >= 3000) resetBtn.textContent = "Start over"; }, 3100);
 };
 
 subscribe(() => refreshHeader());
 
-/* ---- pelisilmukka ---- */
+/* ---- game loop ---- */
 let last = performance.now();
 function loop(now: number): void {
   const dt = Math.min(0.033, (now - last) / 1000);

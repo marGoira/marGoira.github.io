@@ -12,7 +12,7 @@ terraform {
     }
   }
 
-  # Kun haluat tilan pilveen (suositus, jos ajat useammalta koneelta tai GitHub Actionsista):
+  # When you want remote state (recommended if you run from several machines or GitHub Actions):
   # backend "azurerm" {
   #   resource_group_name  = "rg-tfstate"
   #   storage_account_name = "sttfstatexxxxx"

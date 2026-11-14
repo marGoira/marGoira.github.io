@@ -1,5 +1,5 @@
-// Simuloi ihanteelliset Hohmannin siirrot kuhunkin kohteeseen: npm run sim
-// Hyödyllinen, kun virität physics/systems.ts:n arvoja.
+// Simulates ideal Hohmann transfers to each destination: npm run sim
+// Useful when tuning the values in physics/systems.ts.
 import { getSystem } from "../src/physics/systems";
 import { setupBodies, step, bodyPos, bodyVel, gravity } from "../src/physics/orbital";
 function run(sysId:"sun"|"earth", target:string, dv:number, r1:number){

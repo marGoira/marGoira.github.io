@@ -1,7 +1,7 @@
 import { PALETTE, SPRITES } from "../data/ships";
 import { flameColor } from "../state/stats";
 
-/** Piirtää aluksen pikseleinä. a = kulma radiaaneina, 0 = nokka ylös. */
+/** Draws the ship as pixels. a = angle in radians, 0 = nose up. */
 export function drawShip(
   ctx: CanvasRenderingContext2D, x: number, y: number, a: number, hull: number, flame: boolean, scale = 1,
 ): void {
@@ -28,7 +28,7 @@ export function drawShip(
   ctx.restore();
 }
 
-/** Tähtitausta: palauttaa listan [x, y, kirkkaus]. */
+/** Star background: returns a list of [x, y, brightness]. */
 export function makeStars(rand: () => number, n: number, w: number, h: number): [number, number, number][] {
   return Array.from({ length: n }, () => [(rand() * w) | 0, (rand() * h) | 0, rand()]);
 }

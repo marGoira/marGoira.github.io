@@ -1,4 +1,4 @@
-/** Planeettakohtaiset taustat laskeutumisnäkymään. Lisää uusi case uudelle kohteelle. */
+/** Per-planet backgrounds for the landing view. Add a new case for a new destination. */
 import type { Planet } from "../data/planets";
 import { rng } from "../core/util";
 

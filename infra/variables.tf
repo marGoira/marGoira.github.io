@@ -1,34 +1,34 @@
 variable "subscription_id" {
-  description = "Azure-tilauksen id"
+  description = "Azure subscription id"
   type        = string
 }
 
 variable "project" {
-  description = "Projektin lyhenne resurssien nimiin (vain pienet kirjaimet ja numerot)"
+  description = "Project short name for resource names (lowercase letters and digits only)"
   type        = string
   default     = "kantama"
 }
 
 variable "environment" {
-  description = "Ympäristö, esim. dev tai prod"
+  description = "Environment, e.g. dev or prod"
   type        = string
   default     = "dev"
 }
 
 variable "location" {
-  description = "Sijainti Function Appille ja tallennukselle (Flex Consumption -tuettu alue)"
+  description = "Location for the Function App and storage (a region that supports Flex Consumption)"
   type        = string
   default     = "northeurope"
 }
 
 variable "swa_location" {
-  description = "Static Web Appin sijainti (Free-taso tukee vain osaa alueista)"
+  description = "Static Web App location (the Free tier supports only some regions)"
   type        = string
   default     = "westeurope"
 }
 
 variable "extra_cors_origins" {
-  description = "Lisäosoitteet, joista selain saa kutsua rajapintaa (esim. paikallinen Vite)"
+  description = "Extra origins the browser may call the API from (e.g. local Vite)"
   type        = list(string)
   default     = ["http://localhost:5173"]
 }

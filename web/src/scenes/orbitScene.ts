@@ -1,7 +1,7 @@
 /**
- * Matkalento ylhäältä päin: aluksella on delta-v-budjetti (kantama × järjestelmän kerroin),
- * planeetat liikkuvat radoillaan ja niiden painovoima vaikuttaa alukseen (painovoimalinko!).
- * Tavoite: saavu kohteen kaappaussäteen sisään riittävän pienellä suhteellisella nopeudella.
+ * Transfer flight seen from above: the ship has a delta-v budget (range × the system's multiplier),
+ * planets move along their orbits and their gravity pulls on the ship (gravity assists!).
+ * Goal: enter the target's capture radius at a low enough relative speed.
  */
 import { planetById, type Planet } from "../data/planets";
 import { $, canvas2d, clamp, fmt, fmt1, rng } from "../core/util";
@@ -45,7 +45,7 @@ export class OrbitScene implements Scene {
   private stars: [number, number, number][] = [];
   private parts: Particle[] = [];
   private seed = 0;
-  /** Kello käynnistyy vasta ensimmäisestä poltosta tai aikakiihdytyksestä, jotta lähtö ei karkaa. */
+  /** The clock only starts at the first burn or time warp, so the departure window isn't missed. */
   private clockRunning = false;
 
   constructor(private cb: OrbitCallbacks) {}
@@ -75,15 +75,15 @@ export class OrbitScene implements Scene {
     this.clockRunning = false;
     this.parts = [];
     this.stars = makeStars(R, 70, W, H);
-    $("orbitTitle").textContent = `Matkalento · ${planetName(this.planet)}`;
+    $("orbitTitle").textContent = `Transfer flight · ${planetName(this.planet)}`;
     $("orbitResult").hidden = true;
     this.updateWarpLabel();
   }
 
-  /* ---- ohjaimet ---- */
+  /* ---- controls ---- */
   cycleWarp(): void { this.clockRunning = true; this.warpIdx = (this.warpIdx + 1) % WARPS.length; this.updateWarpLabel(); }
   zoom(dir: 1 | -1): void { this.zoomIdx = clamp(this.zoomIdx + dir, 0, this.sys.zooms.length - 1); }
-  private updateWarpLabel(): void { $("oWarp").textContent = `AIKA ×${this.warp}`; }
+  private updateWarpLabel(): void { $("oWarp").textContent = `TIME ×${this.warp}`; }
 
   private captureR() { return this.target.capR * (state.easy ? 1.5 : 1); }
   private vCap() { return this.sys.vCapture * (state.easy ? 2 : 1); }
@@ -98,7 +98,7 @@ export class OrbitScene implements Scene {
     };
   }
 
-  /** Viitekehys MYÖTÄ/VASTA-napeille: kohde, jos ollaan lähellä, muuten keskuskappale. */
+  /** Reference frame for the PROGRADE/RETRO buttons: the target when close, otherwise the central body. */
   private refVelocity(): { v: Vec; name: string } {
     const { d } = this.targetRel();
     if (!this.target.fixed && d < this.captureR() * 4) return { v: bodyVel(this.target, this.t), name: this.target.name };
@@ -118,7 +118,7 @@ export class OrbitScene implements Scene {
     if (this.flight !== "fly") { this.updateParticles(dt); return; }
     const st = this.st;
 
-    // Kääntö: käsin tai automaattisesti myötä/vastasuuntaan
+    // Turning: manual, or automatic towards prograde/retrograde
     const rot = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (rot) this.heading += rot * st.turn * dt;
     else if (input.pro || input.retro) {
@@ -140,7 +140,7 @@ export class OrbitScene implements Scene {
       return;
     }
 
-    // Hidasta aikaa automaattisesti kohteen lähellä
+    // Slow time down automatically near the target
     const near = this.targetRel().d < this.captureR() * 3;
     if (near && this.warp > 4) { this.warpIdx = 1; this.updateWarpLabel(); }
 
@@ -165,11 +165,11 @@ export class OrbitScene implements Scene {
     this.updateParticles(dt);
   }
 
-  /** Palauttaa true, jos lento päättyi. */
+  /** Returns true if the flight ended. */
   private checkEvents(): boolean {
     const s = this.ship;
     const r = Math.hypot(s.x, s.y);
-    if (r < this.sys.central.radius) return this.crash(`Alus syöksyi kohti kappaletta ${this.sys.central.name}.`);
+    if (r < this.sys.central.radius) return this.crash(`The ship plunged into the ${this.sys.central.name}.`);
     if (r > this.sys.escapeR) return this.end("lost");
     const { d, rel } = this.targetRel();
     if (d < this.captureR()) {
@@ -179,7 +179,7 @@ export class OrbitScene implements Scene {
     for (const b of this.bodies) {
       if (b.fixed) continue;
       const p = bodyPos(b, this.t);
-      if (Math.hypot(s.x - p.x, s.y - p.y) < b.radius) return this.crash(`Alus törmäsi kappaleeseen ${b.name}.`);
+      if (Math.hypot(s.x - p.x, s.y - p.y) < b.radius) return this.crash(`The ship collided with ${b.name}.`);
     }
     return false;
   }
@@ -190,18 +190,18 @@ export class OrbitScene implements Scene {
     const bonus = Math.round(frac * 30);
     commit((s) => { s.credits += bonus; });
     const name = planetName(this.planet);
-    const title = viaWormhole ? "Madonreikä avautui" : `Kiertoradalla: ${this.target.name}`;
+    const title = viaWormhole ? "The wormhole opened" : `In orbit: ${this.target.name}`;
     const text = viaWormhole
-      ? `Avaruus kiertyy ympärilläsi. Toisella puolella odottaa ${name} kahden auringon valossa.`
+      ? `Space twists around you. On the other side, ${name} waits in the light of two suns.`
       : this.target.id === this.planet.orbitTarget && this.planet.orbitTarget !== this.planet.id
-        ? `Olet kaapattu kappaleen ${this.target.name} kiertoradalle. Laskeudu sen kuuhun ${name}.`
-        : `Olet kaapattu kiertoradalle. Valmistaudu laskeutumaan.`;
+        ? `You have been captured into orbit around ${this.target.name}. Land on its moon ${name}.`
+        : `You have been captured into orbit. Prepare to land.`;
     showResult($("orbitResult"),
-      `<span class="label ok">Perillä</span><h2>${title}</h2><p class="fact">${text}</p>
-       <dl class="kv"><dt>Delta-v jäljellä</dt><dd>${Math.round(frac * 100)} %</dd><dt>Säästöbonus</dt><dd class="amber">+${fmt(bonus)} KR</dd><dt>Lentoaika</dt><dd>${fmt(this.t)} s</dd></dl>`,
+      `<span class="label ok">Arrived</span><h2>${title}</h2><p class="fact">${text}</p>
+       <dl class="kv"><dt>Delta-v left</dt><dd>${Math.round(frac * 100)}%</dd><dt>Efficiency bonus</dt><dd class="amber">+${fmt(bonus)} CR</dd><dt>Flight time</dt><dd>${fmt(this.t)} s</dd></dl>`,
       [
-        { label: "Aloita laskeutuminen", onClick: () => this.cb.toLander(this.planet.id) },
-        { label: "Tähtikartalle", ghost: true, onClick: () => this.cb.toMap() },
+        { label: "Begin landing", onClick: () => this.cb.toLander(this.planet.id) },
+        { label: "Back to star map", ghost: true, onClick: () => this.cb.toMap() },
       ]);
     return true;
   }
@@ -218,11 +218,11 @@ export class OrbitScene implements Scene {
   private end(kind: "crashed" | "lost", why = ""): boolean {
     this.flight = kind;
     const html = kind === "lost"
-      ? `<span class="label warn">Yhteys katkesi</span><h2>Ajauduit syvään avaruuteen</h2><p class="fact">Rata vei aluksen liian kauas. Polta vastasuuntaan ajoissa tai käytä lyhyempää rataa.</p>`
-      : `<span class="label warn">Alus tuhoutui</span><h2>Törmäys</h2><p class="fact">${why}</p>`;
+      ? `<span class="label warn">Signal lost</span><h2>You drifted into deep space</h2><p class="fact">Your trajectory took the ship too far out. Burn retrograde in time or use a shorter path.</p>`
+      : `<span class="label warn">Ship destroyed</span><h2>Collision</h2><p class="fact">${why}</p>`;
     window.setTimeout(() => showResult($("orbitResult"), html, [
-      { label: "Yritä uudelleen", onClick: () => this.start(this.planet.id) },
-      { label: "Tähtikartalle", ghost: true, onClick: () => this.cb.toMap() },
+      { label: "Try again", onClick: () => this.start(this.planet.id) },
+      { label: "Back to star map", ghost: true, onClick: () => this.cb.toMap() },
     ]), kind === "crashed" ? 900 : 200);
     return true;
   }
@@ -232,7 +232,7 @@ export class OrbitScene implements Scene {
     this.parts = this.parts.filter((q) => q.life > 0);
   }
 
-  /* ---- piirto ---- */
+  /* ---- drawing ---- */
   draw(): void {
     const x = this.ctx;
     const z = this.sys.zooms[this.zoomIdx];
@@ -247,7 +247,7 @@ export class OrbitScene implements Scene {
       x.fillRect(((sx - cx * z * 0.02) % W + W) % W | 0, ((sy - cy * z * 0.02) % H + H) % H | 0, 1, 1);
     }
 
-    // radat
+    // orbits
     const [ox, oy] = S(0, 0);
     x.lineWidth = 1;
     for (const b of this.bodies) {
@@ -256,7 +256,7 @@ export class OrbitScene implements Scene {
       x.beginPath(); x.arc(ox, oy, b.r * z, 0, TAU); x.stroke();
     }
 
-    // keskuskappale
+    // central body
     const cr = Math.max(3, this.sys.central.radius * z);
     if (this.sys.id === "sun") disc(ox, oy, cr * 1.6, "rgba(255,207,74,.12)");
     disc(ox, oy, cr, this.sys.central.color);
@@ -288,7 +288,7 @@ export class OrbitScene implements Scene {
       x.fillText(b.name.toUpperCase(), sx, sy - Math.max(r, b === this.target ? this.captureR() * z : 0) - 4);
     }
 
-    // ennustettu rata
+    // predicted trajectory
     if (this.pred && this.flight === "fly") {
       const pts = this.pred.points;
       for (let i = 0; i < pts.length; i += 3) {
@@ -307,11 +307,11 @@ export class OrbitScene implements Scene {
       }
     }
 
-    // alus
+    // ship
     if (this.flight !== "crashed") drawShip(x, W / 2, H / 2, this.heading, state.hull, this.thrusting);
     for (const q of this.parts) { x.fillStyle = q.c; x.fillRect(q.x | 0, q.y | 0, 1, 1); }
 
-    // nuoli kohteeseen, jos se ei näy ruudulla
+    // arrow towards the target when it is off screen
     const tp = bodyPos(this.target, this.t);
     const [tsx, tsy] = S(tp.x, tp.y);
     if (tsx < 0 || tsx > W || tsy < 0 || tsy > H) {
@@ -332,14 +332,14 @@ export class OrbitScene implements Scene {
     const vcap = this.vCap();
     const ref = this.refVelocity().name;
     const c = this.pred?.closest;
-    const relTxt = this.target.fixed ? "" : `<span class="${rel < vcap ? "good" : "bad"}">SUHT. ${fmt1(rel)} / ${fmt1(vcap)}</span>`;
+    const relTxt = this.target.fixed ? "" : `<span class="${rel < vcap ? "good" : "bad"}">REL ${fmt1(rel)} / ${fmt1(vcap)}</span>`;
     $("orbitHud").innerHTML = `
       <span>ΔV<span class="fuelbar"><i style="width:${Math.max(0, f * 58)}px;${f < 0.15 ? "background:var(--bad)" : ""}"></i></span> ${fmt1(this.dvLeft)}</span>
       <span>${this.target.name.toUpperCase()} ${fmt(d)}</span>
       ${relTxt}
-      ${this.st.predictor && c ? `<span class="${c.d < this.captureR() ? "good" : ""}">LÄHIN OHITUS ${fmt(c.d)}</span>` : ""}
-      <span>SUUNTA: ${ref.toUpperCase()}</span>
-      ${!this.clockRunning ? `<span class="good">KELLO ODOTTAA · POLTA MYÖTÄSUUNTAAN LÄHTEÄKSESI</span>` : ""}
-      ${this.dvLeft <= 0 && this.flight === "fly" ? `<span class="bad">POLTTOAINE LOPPU · HINAA KOTIIN TAI ODOTA OHILENTOA</span>` : ""}`;
+      ${this.st.predictor && c ? `<span class="${c.d < this.captureR() ? "good" : ""}">CLOSEST ${fmt(c.d)}</span>` : ""}
+      <span>FRAME: ${ref.toUpperCase()}</span>
+      ${!this.clockRunning ? `<span class="good">CLOCK PAUSED · BURN PROGRADE TO DEPART</span>` : ""}
+      ${this.dvLeft <= 0 && this.flight === "fly" ? `<span class="bad">OUT OF FUEL · TOW HOME OR WAIT FOR A FLYBY</span>` : ""}`;
   }
 }

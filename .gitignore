@@ -16,7 +16,7 @@ infra/*.tfstate.*
 infra/terraform.tfvars
 infra/.terraform.lock.hcl.bak
 
-# Muut
+# Other
 .DS_Store
 *.log
 .vscode/*

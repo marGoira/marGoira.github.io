@@ -3,8 +3,8 @@ using System.Text.Json;
 namespace Kantama.Api.Models;
 
 /// <summary>
-/// Pelin tallennuksen kentät, joita rajapinta tarkistaa. Muut kentät tallennetaan JSONina sellaisenaan.
-/// Pidä linjassa tiedoston web/src/state/gameState.ts kanssa.
+/// The save game fields the API validates. Other fields are stored as JSON unchanged.
+/// Keep in line with web/src/state/gameState.ts.
 /// </summary>
 public sealed class SaveGame
 {
@@ -21,15 +21,15 @@ public sealed class SaveGame
     public bool Easy { get; set; }
     public string ExoName { get; set; } = "";
 
-    /// <summary>Palauttaa virheviestin tai null, jos tallennus kelpaa.</summary>
+    /// <summary>Returns an error message, or null if the save is valid.</summary>
     public string? Validate(string routePlayerId)
     {
-        if (!string.Equals(PlayerId, routePlayerId, StringComparison.OrdinalIgnoreCase)) return "playerId ei täsmää";
-        if (!DateTimeOffset.TryParse(UpdatedAt, out _)) return "updatedAt puuttuu tai on virheellinen";
-        if (Credits < 0 || Research < 0) return "Negatiiviset resurssit";
-        if (Hull is < 0 or > 3) return "Tuntematon runkoluokka";
-        if (Tech.Count > 64) return "Liikaa teknologioita";
-        if (ExoName.Length > 16) return "Planeetan nimi on liian pitkä";
+        if (!string.Equals(PlayerId, routePlayerId, StringComparison.OrdinalIgnoreCase)) return "playerId does not match";
+        if (!DateTimeOffset.TryParse(UpdatedAt, out _)) return "updatedAt is missing or invalid";
+        if (Credits < 0 || Research < 0) return "Negative resources";
+        if (Hull is < 0 or > 3) return "Unknown hull class";
+        if (Tech.Count > 64) return "Too many technologies";
+        if (ExoName.Length > 16) return "Planet name is too long";
         return null;
     }
 }

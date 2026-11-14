@@ -1,4 +1,4 @@
-/** Tähtikartta: kaavamainen aurinkokunta, josta valitaan kohde. Ei mittakaavassa. */
+/** Star map: a schematic solar system for picking a destination. Not to scale. */
 import { PLANETS, planetById, type PlanetId } from "../data/planets";
 import { $, canvas2d, esc, fmt, fmt1, rng } from "../core/util";
 import { commit, state } from "../state/gameState";
@@ -73,8 +73,8 @@ export class MapScene implements Scene {
       mx.beginPath(); mx.ellipse(WORMHOLE[0], WORMHOLE[1], 10 - i * 1.8, 6 - i, t * (unlocked ? 1.2 : 0.2) + i, 0, 5.2); mx.stroke();
     }
     mx.font = '6px "Press Start 2P"'; mx.textAlign = "center";
-    mx.fillStyle = unlocked ? "#b48cff" : "#3a3f63"; mx.fillText(unlocked ? "MADONREIKÄ" : "???", WORMHOLE[0], WORMHOLE[1] - 12);
-    mx.fillStyle = "#5a6185"; mx.fillText("MAA", e[0], e[1] + 12);
+    mx.fillStyle = unlocked ? "#b48cff" : "#3a3f63"; mx.fillText(unlocked ? "WORMHOLE" : "???", WORMHOLE[0], WORMHOLE[1] - 12);
+    mx.fillStyle = "#5a6185"; mx.fillText("EARTH", e[0], e[1] + 12);
 
     for (const p of PLANETS) {
       if (!isUnlocked(p)) continue;
@@ -89,15 +89,15 @@ export class MapScene implements Scene {
     }
   }
 
-  /** Kohdelista ja tietopaneeli (DOM). */
+  /** Destination list and info panel (DOM). */
   render(): void {
     const st = stats();
     const list = $("dests");
     list.innerHTML = PLANETS.filter(isUnlocked).map((p) => {
       const visited = state.visits[p.id];
       return `<button class="dest ${this.selected === p.id ? "sel" : ""}" data-id="${p.id}"><b>${esc(planetName(p))}</b>
-        <span>Suositus ${fmt1(p.dist)}${visited ? ` · käyty ${visited}×` : ""}</span></button>`;
-    }).join("") + (st.wormhole ? "" : `<div class="dest locked"><b>???</b><span>Tutki madonreikäteoria</span></div>`);
+        <span>Recommended ${fmt1(p.dist)}${visited ? ` · visited ${visited}×` : ""}</span></button>`;
+    }).join("") + (st.wormhole ? "" : `<div class="dest locked"><b>???</b><span>Research Wormhole Theory</span></div>`);
     list.querySelectorAll<HTMLButtonElement>("button.dest").forEach((b) => (b.onclick = () => { this.selected = b.dataset.id as PlanetId; this.render(); }));
 
     const p = planetById(this.selected);
@@ -107,34 +107,34 @@ export class MapScene implements Scene {
     const k = first ? 1 : 0.5;
     const canAuto = (state.easy || !first) && autopilotReach(p);
     const recommendedOk = st.range + 1e-6 >= p.dist * (st.oberth ? 0.75 : 1);
-    const conditions = [p.wind ? "tuulinen" : "", p.drag > 0.2 ? "paksu ilmakehä" : "", p.rough > 1.2 ? "rosoinen maasto" : ""].filter(Boolean).join(", ") || "tyhjiö, ei tuulta";
+    const conditions = [p.wind ? "windy" : "", p.drag > 0.2 ? "thick atmosphere" : "", p.rough > 1.2 ? "rugged terrain" : ""].filter(Boolean).join(", ") || "vacuum, no wind";
 
     $("destPanel").innerHTML = `
-      <span class="label">${p.wormhole ? "Toinen galaksi" : p.system === "earth" ? "Maan kiertorata" : "Aurinkokunta"}</span>
+      <span class="label">${p.wormhole ? "Another galaxy" : p.system === "earth" ? "Earth orbit" : "Solar system"}</span>
       <h2>${esc(planetName(p))}</h2>
       <p class="fact">${p.fact}</p>
       <dl class="kv">
-        <dt>Painovoima</dt><dd>${p.g.toLocaleString("fi-FI")} m/s²${p.g < 1 ? " (hyvin heikko)" : ""}</dd>
-        <dt>Olosuhteet</dt><dd>${conditions}</dd>
-        <dt>Kantamasi</dt><dd class="${recommendedOk ? "ok" : "warn"}">${fmt1(st.range)} (suositus ${fmt1(p.dist)})</dd>
-        <dt>Delta-v</dt><dd>${fmt1(budget)} yksikköä matkalle</dd>
+        <dt>Gravity</dt><dd>${p.g.toLocaleString("en-US")} m/s²${p.g < 1 ? " (very weak)" : ""}</dd>
+        <dt>Conditions</dt><dd>${conditions}</dd>
+        <dt>Your range</dt><dd class="${recommendedOk ? "ok" : "warn"}">${fmt1(st.range)} (recommended ${fmt1(p.dist)})</dd>
+        <dt>Delta-v</dt><dd>${fmt1(budget)} units for the trip</dd>
       </dl>
-      <div class="mission"><span class="label">${first ? "Tehtävä" : "Rutiinilento"}</span>
+      <div class="mission"><span class="label">${first ? "Mission" : "Routine flight"}</span>
         <p><b>${p.mission.title}.</b> ${p.mission.text}</p>
-        <p>Palkkio: <span class="amber">${fmt(p.mission.credits * k)} KR</span> ja <span class="cyan">${fmt(p.mission.research * k)} TP</span>, kerrottuna alustan kertoimella (×1–×3).</p>
+        <p>Reward: <span class="amber">${fmt(p.mission.credits * k)} CR</span> and <span class="cyan">${fmt(p.mission.research * k)} RP</span>, multiplied by the pad multiplier (×1–×3).</p>
       </div>
-      ${p.id === "exo" ? `<label class="label" for="nameIn">Anna planeetalle nimi</label><input type="text" id="nameIn" maxlength="16" placeholder="Aurora b" value="${esc(state.exoName)}">` : ""}
+      ${p.id === "exo" ? `<label class="label" for="nameIn">Name this planet</label><input type="text" id="nameIn" maxlength="16" placeholder="Aurora b" value="${esc(state.exoName)}">` : ""}
       <div class="btnrow">
-        <button class="btn" id="go">Lähde matkalennolle</button>
-        <button class="btn ghost" id="auto" ${canAuto ? "" : "disabled"}>Autopilotti</button>
+        <button class="btn" id="go">Start transfer flight</button>
+        <button class="btn ghost" id="auto" ${canAuto ? "" : "disabled"}>Autopilot</button>
       </div>
       <p class="fact">${canAuto
-        ? "Autopilotti hyppää suoraan laskeutumiseen."
+        ? "The autopilot skips straight to the landing."
         : first && !state.easy
-          ? "Ensimmäinen lento kohteeseen lennetään itse. Sen jälkeen autopilotti on käytössä."
-          : `Autopilotti vaatii kantaman ${fmt1(autopilotCost(p))}.`}</p>
-      ${!recommendedOk ? `<p class="fact warn">Kantama on suositusta pienempi. Lento voi onnistua taitavalla painovoimalingolla, mutta polttoaine on tiukalla.</p>` : ""}
-      ${!state.tech.length && !Object.keys(state.visits).length ? `<p class="fact">Vinkki: aloita Kuusta. Pidä MYÖTÄ-nappia ja polta moottoria, kunnes ennustettu rata ulottuu Kuun radalle.</p>` : ""}`;
+          ? "You fly the first trip to a destination yourself. After that the autopilot is available."
+          : `The autopilot needs a range of ${fmt1(autopilotCost(p))}.`}</p>
+      ${!recommendedOk ? `<p class="fact warn">Your range is below the recommendation. The flight can succeed with a skilful gravity assist, but fuel will be tight.</p>` : ""}
+      ${!state.tech.length && !Object.keys(state.visits).length ? `<p class="fact">Tip: start with the Moon. Hold the PROGRADE button and fire the engine until the predicted path reaches the Moon's orbit.</p>` : ""}`;
     const ni = document.getElementById("nameIn") as HTMLInputElement | null;
     if (ni) ni.oninput = () => commit((s) => { s.exoName = ni.value.trim().slice(0, 16); });
     $("go").onclick = () => this.cb.fly(p.id);

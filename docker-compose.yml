@@ -1,4 +1,4 @@
-# Paikallinen Azure Storage -emulaattori rajapintaa varten: docker compose up -d
+# Local Azure Storage emulator for the API: docker compose up -d
 services:
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite:latest

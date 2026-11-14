@@ -1,6 +1,6 @@
 /**
- * Matkalennon fysiikka: keskuskappale + planeetat ympyräradoilla (analyyttisesti),
- * alus integroidaan leapfrog-menetelmällä, joka säilyttää energian hyvin.
+ * Transfer flight physics: a central body + planets on circular orbits (analytic);
+ * the ship is integrated with the leapfrog method, which conserves energy well.
  */
 import type { OrbitBody, OrbitSystem } from "./systems";
 
@@ -21,7 +21,7 @@ export function bodyVel(b: BodyState, t: number): Vec {
   return { x: -b.omega * b.r * Math.sin(th), y: b.omega * b.r * Math.cos(th) };
 }
 
-/** Painovoimakiihtyvyys pisteessä (x, y) hetkellä t. */
+/** Gravitational acceleration at point (x, y) at time t. */
 export function gravity(sys: OrbitSystem, bodies: BodyState[], x: number, y: number, t: number): Vec {
   const r2 = x * x + y * y;
   const r = Math.sqrt(r2);
@@ -31,7 +31,7 @@ export function gravity(sys: OrbitSystem, bodies: BodyState[], x: number, y: num
     if (b.mu === 0) continue;
     const p = bodyPos(b, t);
     const dx = x - p.x, dy = y - p.y;
-    const d2 = dx * dx + dy * dy + 0.5; // pehmennys estää singulariteetin
+    const d2 = dx * dx + dy * dy + 0.5; // softening prevents a singularity
     const kb = -b.mu / (d2 * Math.sqrt(d2));
     ax += kb * dx;
     ay += kb * dy;
@@ -41,7 +41,7 @@ export function gravity(sys: OrbitSystem, bodies: BodyState[], x: number, y: num
 
 export interface ShipState { x: number; y: number; vx: number; vy: number }
 
-/** Yksi leapfrog-askel (kick–drift–kick). extra = moottorin kiihtyvyys. */
+/** One leapfrog step (kick–drift–kick). extra = engine acceleration. */
 export function step(sys: OrbitSystem, bodies: BodyState[], s: ShipState, t: number, h: number, extra: Vec): void {
   let a = gravity(sys, bodies, s.x, s.y, t);
   s.vx += (a.x + extra.x) * h * 0.5;
@@ -53,7 +53,7 @@ export function step(sys: OrbitSystem, bodies: BodyState[], s: ShipState, t: num
   s.vy += (a.y + extra.y) * h * 0.5;
 }
 
-/** Hohmannin siirtoradan lentoaika säteeltä r1 säteelle r2. */
+/** Flight time of a Hohmann transfer from radius r1 to radius r2. */
 export function hohmannTime(mu: number, r1: number, r2: number): number {
   const a = (r1 + r2) / 2;
   return Math.PI * Math.sqrt((a * a * a) / mu);
@@ -65,7 +65,7 @@ export interface Prediction {
   impact: boolean;
 }
 
-/** Laskee lentoradan eteenpäin ilman moottoria. */
+/** Predicts the trajectory ahead with the engine off. */
 export function predict(
   sys: OrbitSystem, bodies: BodyState[], ship: ShipState, t0: number, steps: number, h: number, target?: BodyState,
 ): Prediction {
@@ -89,8 +89,8 @@ export function predict(
 }
 
 /**
- * Asettaa planeettojen alkuvaiheet niin, että kohde on suotuisassa kohdassa
- * Hohmannin siirtoon, kun alus polttaa heti myötäsuuntaan. Pieni satunnaisuus pitää lennot erilaisina.
+ * Sets the planets' starting phases so the target is well placed for a Hohmann
+ * transfer when the ship burns prograde right away. A little randomness keeps flights varied.
  */
 export function setupBodies(sys: OrbitSystem, targetId: string, shipTheta: number, shipR: number, rand: () => number, includeWormhole: boolean): BodyState[] {
   const out: BodyState[] = [];

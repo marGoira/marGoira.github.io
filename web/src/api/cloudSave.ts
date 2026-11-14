@@ -1,6 +1,6 @@
 /**
- * Valinnainen pilvitallennus C#-rajapintaan (api/-kansio).
- * Pois päältä, jos VITE_API_URL on tyhjä: peli toimii silloin täysin paikallisesti.
+ * Optional cloud save to the C# API (the api/ folder).
+ * Off when VITE_API_URL is empty: the game then runs fully locally.
  */
 import { replaceState, sanitize, state, subscribe, type GameState } from "../state/gameState";
 
@@ -18,32 +18,32 @@ async function push(s: GameState, status: Status): Promise<void> {
       body: JSON.stringify(s),
     });
     if (res.status === 409) {
-      // Toinen laite tallensi uudemman version: otetaan se käyttöön.
+      // Another device saved a newer version: switch to it.
       const latest = await fetch(`${API}/saves/${encodeURIComponent(s.playerId)}`);
       const remote = latest.ok ? sanitize(await latest.json(), s.playerId) : null;
       if (remote) replaceState(remote);
-      status("Uudempi tallennus haettiin pilvestä");
+      status("Fetched a newer save from the cloud");
       return;
     }
-    status(res.ok ? "Pilvitallennus ajan tasalla" : `Pilvitallennus epäonnistui (${res.status})`);
+    status(res.ok ? "Cloud save up to date" : `Cloud save failed (${res.status})`);
   } catch {
-    status("Pilvipalvelu ei vastaa, tallennettu vain tälle laitteelle");
+    status("Cloud service not responding, saved on this device only");
   }
 }
 
-/** Hakee pilvestä uudemman tallennuksen ja alkaa synkronoida muutokset. */
+/** Fetches a newer save from the cloud and starts syncing changes. */
 export async function initCloudSave(status: Status): Promise<void> {
   if (!cloudEnabled) return;
-  status("Yhdistetään pilveen…");
+  status("Connecting to the cloud…");
   try {
     const res = await fetch(`${API}/saves/${encodeURIComponent(state.playerId)}`);
     if (res.ok) {
       const remote = sanitize(await res.json(), state.playerId);
       if (remote && remote.updatedAt > state.updatedAt) replaceState(remote);
     }
-    status("Pilvitallennus käytössä");
+    status("Cloud save enabled");
   } catch {
-    status("Pilvipalvelu ei vastaa, tallennetaan vain tälle laitteelle");
+    status("Cloud service not responding, saving on this device only");
   }
   subscribe((s) => {
     window.clearTimeout(timer);

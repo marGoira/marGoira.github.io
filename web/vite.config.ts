@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
 
-// Paikallisessa kehityksessä /api-kutsut ohjataan Azure Functions -hostille (func start, portti 7071).
+// In local development, /api calls are proxied to the Azure Functions host (func start, port 7071).
 export default defineConfig({
-  // Suhteelliset polut: sama build toimii GitHub Pagesissa sekä juuressa (xxx.github.io)
-  // että alikansiossa (xxx.github.io/kantama/), Static Web Appsissa ja paikallisesti.
+  // Relative paths: the same build works on GitHub Pages both at the root (xxx.github.io)
+  // and in a subfolder (xxx.github.io/kantama/), on Static Web Apps and locally.
   base: "./",
   server: {
     port: 5173,

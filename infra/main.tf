@@ -17,8 +17,8 @@ resource "azurerm_resource_group" "main" {
 }
 
 # ---------------------------------------------------------------------------
-# Tallennus: Table Storage pelitallennuksille, Blob tulevaisuuden tiedostoille
-# (esim. lentojen uusinnat, pelaajien kuvat) ja Function Appin julkaisupaketeille.
+# Storage: Table Storage for game saves, Blob for future files
+# (e.g. flight replays, player images) and the Function App's deployment packages.
 # ---------------------------------------------------------------------------
 resource "azurerm_storage_account" "main" {
   name                            = substr("st${var.project}${var.environment}${local.suffix}", 0, 24)
@@ -28,7 +28,7 @@ resource "azurerm_storage_account" "main" {
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
-  shared_access_key_enabled       = false # vain Entra ID / managed identity
+  shared_access_key_enabled       = false # Entra ID / managed identity only
   tags                            = local.tags
 }
 
@@ -44,11 +44,11 @@ resource "azurerm_storage_container" "replays" {
   container_access_type = "private"
 }
 
-# Pelitallennusten taulu ("saves") luodaan rajapinnan käynnistyessä (CreateIfNotExists).
-# Näin Terraformia ajavalla käyttäjällä ei tarvitse olla data plane -oikeuksia, kun avaimet ovat pois päältä.
+# The game saves table ("saves") is created when the API starts (CreateIfNotExists).
+# That way the user running Terraform needs no data plane permissions while keys are disabled.
 
 # ---------------------------------------------------------------------------
-# Valvonta
+# Monitoring
 # ---------------------------------------------------------------------------
 resource "azurerm_log_analytics_workspace" "main" {
   name                = "log-${local.name}"
@@ -81,7 +81,7 @@ resource "azurerm_static_web_app" "web" {
 }
 
 # ---------------------------------------------------------------------------
-# Backend: C# Function App, Flex Consumption (maksa vain käytöstä)
+# Backend: C# Function App, Flex Consumption (pay only for usage)
 # ---------------------------------------------------------------------------
 resource "azurerm_service_plan" "api" {
   name                = "asp-${local.name}"
@@ -127,12 +127,12 @@ resource "azurerm_function_app_flex_consumption" "api" {
   tags = local.tags
 }
 
-# Function Appin identiteetti saa oikeudet tallennukseen ilman avaimia.
+# The Function App's identity gets storage access without keys.
 locals {
   api_roles = [
-    "Storage Blob Data Owner",       # julkaisupaketti + host
-    "Storage Queue Data Contributor", # Functions-host
-    "Storage Table Data Contributor", # pelitallennukset
+    "Storage Blob Data Owner",       # deployment package + host
+    "Storage Queue Data Contributor", # Functions host
+    "Storage Table Data Contributor", # game saves
   ]
 }
 

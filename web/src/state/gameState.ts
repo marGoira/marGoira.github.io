@@ -1,6 +1,6 @@
 /**
- * Pelin tallennettava tila. Kaikki muutokset kulkevat commit()-funktion kautta,
- * joka tallentaa localStorageen ja (jos käytössä) pilveen.
+ * The game's persistent state. Every change goes through commit(),
+ * which saves to localStorage and (when enabled) to the cloud.
  */
 export interface GameState {
   version: 2;
@@ -12,7 +12,7 @@ export interface GameState {
   tech: string[];
   visits: Record<string, number>;
   easy: boolean;
-  /** Pelaajan antama nimi Aurora b -planeetalle */
+  /** The player's own name for the planet Aurora b */
   exoName: string;
 }
 
@@ -33,7 +33,7 @@ export function freshState(playerId = uuid()): GameState {
   };
 }
 
-/** Hyväksyy vain järkevän muotoisen tallennuksen (localStoragesta tai pilvestä). */
+/** Accepts only a sensibly shaped save (from localStorage or the cloud). */
 export function sanitize(raw: unknown, fallbackId?: string): GameState | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
@@ -56,24 +56,24 @@ export function loadLocal(): GameState | null {
   try {
     const cur = localStorage.getItem(KEY);
     if (cur) return sanitize(JSON.parse(cur));
-    const legacy = localStorage.getItem(LEGACY_KEY); // MVP-version tallennus
+    const legacy = localStorage.getItem(LEGACY_KEY); // save from the MVP version
     if (legacy) return sanitize(JSON.parse(legacy));
-  } catch { /* yksityinen ikkuna tms. */ }
+  } catch { /* private window etc. */ }
   return null;
 }
 
 export function saveLocal(s: GameState): void {
-  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* ei tallennustilaa */ }
+  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* no storage available */ }
 }
 
-/* ---- Yksinkertainen store ---- */
+/* ---- Simple store ---- */
 export let state: GameState = loadLocal() ?? freshState();
 
 type Listener = (s: GameState) => void;
 const listeners: Listener[] = [];
 export const subscribe = (fn: Listener) => listeners.push(fn);
 
-/** Muuta tilaa ja tallenna. Esim. commit(s => { s.credits += 10 }) */
+/** Change the state and save it. E.g. commit(s => { s.credits += 10 }) */
 export function commit(mutator?: (s: GameState) => void): void {
   mutator?.(state);
   state.updatedAt = new Date().toISOString();

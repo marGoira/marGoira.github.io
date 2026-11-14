@@ -14,8 +14,8 @@ builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
-// Paikallisesti: Storage__ConnectionString = UseDevelopmentStorage=true (Azurite).
-// Pilvessä: Storage__TableEndpoint + Function Appin managed identity (ei salasanoja).
+// Locally: Storage__ConnectionString = UseDevelopmentStorage=true (Azurite).
+// In the cloud: Storage__TableEndpoint + the Function App's managed identity (no passwords).
 builder.Services.AddSingleton(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -24,7 +24,7 @@ builder.Services.AddSingleton(sp =>
         return new TableServiceClient(connectionString);
 
     var endpoint = config["Storage:TableEndpoint"]
-        ?? throw new InvalidOperationException("Aseta Storage__ConnectionString tai Storage__TableEndpoint.");
+        ?? throw new InvalidOperationException("Set Storage__ConnectionString or Storage__TableEndpoint.");
     return new TableServiceClient(new Uri(endpoint), new DefaultAzureCredential());
 });
 

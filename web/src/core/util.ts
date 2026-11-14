@@ -1,6 +1,6 @@
-/** Yleiset apufunktiot: satunnaisluvut, muotoilu ja DOM. */
+/** General helpers: random numbers, formatting and DOM. */
 
-/** Siemenellinen satunnaislukugeneraattori (mulberry32). Sama siemen = sama maasto. */
+/** Seeded random number generator (mulberry32). Same seed = same terrain. */
 export function rng(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -14,12 +14,12 @@ export function rng(seed: number): () => number {
 
 export const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
-export const fmt = (n: number) => Math.round(n).toLocaleString("fi-FI");
-export const fmt1 = (n: number) => (Math.round(n * 100) / 100).toLocaleString("fi-FI");
+export const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
+export const fmt1 = (n: number) => (Math.round(n * 100) / 100).toLocaleString("en-US");
 
 export function $<T extends HTMLElement = HTMLElement>(id: string): T {
   const el = document.getElementById(id);
-  if (!el) throw new Error(`Elementtiä #${id} ei löydy`);
+  if (!el) throw new Error(`Element #${id} not found`);
   return el as T;
 }
 
@@ -38,7 +38,7 @@ export function toast(msg: string): void {
 export function canvas2d(id: string): CanvasRenderingContext2D {
   const c = $<HTMLCanvasElement>(id);
   const ctx = c.getContext("2d");
-  if (!ctx) throw new Error("Canvas 2D ei ole käytettävissä");
+  if (!ctx) throw new Error("Canvas 2D is not available");
   ctx.imageSmoothingEnabled = false;
   return ctx;
 }

@@ -1,4 +1,4 @@
-/* Kantama — yksi retrokonsoli. Värit ja fontit tokeneina, jotta teeman vaihto on helppoa. */
+/* Kantama: one retro console. Colours and fonts are tokens so the theme is easy to change. */
 :root {
   --void: #07080f; --panel: #10131f; --panel2: #171b2c; --line: #262c4a;
   --ink: #e8e4d6; --dim: #8a8fab; --amber: #ffb347; --cyan: #6fe3ff;
@@ -87,7 +87,7 @@ input[type=text] { font: inherit; background: var(--void); color: var(--ink); bo
 .hull.cur { border-color: var(--amber); }
 .hull.own { color: var(--dim); }
 
-/* Pelinäkymät: ei tekstin valintaa eikä iOS:n pitkän painalluksen valikkoa */
+/* Gameplay views: no text selection and no iOS long-press menu */
 .playview, .playview *, .screen, .screen * {
   -webkit-user-select: none; user-select: none;
   -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;

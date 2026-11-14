@@ -1,4 +1,4 @@
-/** Proseduraalinen maasto: siniaaltojen summa + kolme tasaista laskeutumisalustaa (×1, ×2, ×3). */
+/** Procedural terrain: a sum of sine waves + three flat landing pads (×1, ×2, ×3). */
 import type { Planet } from "../data/planets";
 import { rng } from "../core/util";
 
@@ -39,7 +39,7 @@ export function generateTerrain(seed: number, p: Planet, W: number, H: number, e
     }
   }
   for (let x = 0; x <= W; x++) h[x] = Math.max(H * 0.42, Math.min(H - 8, h[x]));
-  // pidä alustat tasaisina leikkauksen jälkeenkin
+  // keep the pads flat after clamping too
   for (const q of pads) { q.y = Math.max(H * 0.42, Math.min(H - 8, q.y)); for (let x = q.x1; x <= q.x2; x++) h[x] = q.y; }
   return { h, pads };
 }

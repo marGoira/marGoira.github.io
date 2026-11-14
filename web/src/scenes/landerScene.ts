@@ -1,4 +1,4 @@
-/** Laskeutuminen sivukuvantona: painovoima, työntö, tuuli ja ilmanvastus. */
+/** Landing in side view: gravity, thrust, wind and air drag. */
 import { planetById, type Planet } from "../data/planets";
 import { techById, TECH } from "../data/tech";
 import { $, canvas2d, fmt, fmt1, rng } from "../core/util";
@@ -42,7 +42,7 @@ export class LanderScene implements Scene {
       x: 40 + R() * 240, y: 22, vx: (R() - 0.5) * 24, vy: 4, a: 0,
       fuel: st.tank, thr: false, wind: 0, t: 0, state: "fly", parts: [],
     };
-    $("landTitle").textContent = `Laskeutuminen · ${planetName(p)}`;
+    $("landTitle").textContent = `Landing · ${planetName(p)}`;
     $("result").hidden = true;
   }
 
@@ -111,10 +111,10 @@ export class LanderScene implements Scene {
     const minx = Math.min(fl[0], fr[0]), maxx = Math.max(fl[0], fr[0]);
     const pad = L.terr.pads.find((q) => minx >= q.x1 - 1 && maxx <= q.x2 + 1);
     const why: string[] = [];
-    if (!pad) why.push("Et osunut tasaiselle alustalle.");
-    if (L.vy > lim.vy) why.push(`Pystynopeus ${fmt1(L.vy / G_SCALE)} m/s, raja ${fmt1(lim.vy / G_SCALE)}.`);
-    if (Math.abs(L.vx) > lim.vx) why.push(`Sivuttaisnopeus liian suuri (${fmt1(Math.abs(L.vx) / G_SCALE)} m/s).`);
-    if (Math.abs(L.a) > lim.a) why.push(`Alus oli kallellaan ${Math.round(Math.abs(L.a) * 57.3)}°.`);
+    if (!pad) why.push("You missed the flat landing pad.");
+    if (L.vy > lim.vy) why.push(`Vertical speed ${fmt1(L.vy / G_SCALE)} m/s, limit ${fmt1(lim.vy / G_SCALE)}.`);
+    if (Math.abs(L.vx) > lim.vx) why.push(`Horizontal speed too high (${fmt1(Math.abs(L.vx) / G_SCALE)} m/s).`);
+    if (Math.abs(L.a) > lim.a) why.push(`The ship was tilted ${Math.round(Math.abs(L.a) * 57.3)}°.`);
     const p = L.p;
     let html: string;
     if (!why.length && pad) {
@@ -128,21 +128,21 @@ export class LanderScene implements Scene {
       commit((s) => { s.credits += cr; s.research += tp; s.visits[p.id] = (s.visits[p.id] ?? 0) + 1; });
       for (let i = 0; i < 24; i++) L.parts.push({ x: L.x, y: pad.y, vx: (Math.random() - 0.5) * 50, vy: -Math.random() * 20, g: 30, life: 0.8, c: p.top });
       const affordable = TECH.filter((t) => !state.tech.includes(t.id) && t.requires.every((r) => state.tech.includes(r)) && state.research >= t.cost);
-      html = `<span class="label ok">${first ? "Tehtävä suoritettu" : "Rutiinilento onnistui"}</span><h2>Kotka on laskeutunut</h2>
-        <dl class="kv"><dt>Alusta</dt><dd>×${pad.mult}</dd>
-        <dt>Krediitit</dt><dd class="amber">+${fmt(cr)} KR (polttoainebonus ${bonus})</dd>
-        <dt>Tutkimus</dt><dd class="cyan">+${fmt(tp)} TP</dd></dl>
-        ${affordable.length ? `<p class="fact">Sinulla on varaa tutkia: ${affordable.map((t) => techById(t.id).name).join(", ")}.</p>` : ""}`;
+      html = `<span class="label ok">${first ? "Mission complete" : "Routine flight successful"}</span><h2>The Eagle has landed</h2>
+        <dl class="kv"><dt>Pad</dt><dd>×${pad.mult}</dd>
+        <dt>Credits</dt><dd class="amber">+${fmt(cr)} CR (fuel bonus ${bonus})</dd>
+        <dt>Research</dt><dd class="cyan">+${fmt(tp)} RP</dd></dl>
+        ${affordable.length ? `<p class="fact">You can afford to research: ${affordable.map((t) => techById(t.id).name).join(", ")}.</p>` : ""}`;
     } else {
       L.state = "crashed";
       const cols = ["#ffb347", "#ff6b4a", "#fff", "#e8e4d6"];
       for (let i = 0; i < 50; i++) L.parts.push({ x: L.x, y: L.y, vx: (Math.random() - 0.5) * 110, vy: -Math.random() * 90, g: this.gravity(p), life: 1 + Math.random(), c: cols[i % 4] });
-      html = `<span class="label warn">Alus tuhoutui</span><h2>Lennonjohto menetti yhteyden</h2><p class="fact">${why.join(" ")}</p><p class="fact">Alus oli vakuutettu. Yritä uudestaan hitaammin.</p>`;
+      html = `<span class="label warn">Ship destroyed</span><h2>Mission control lost contact</h2><p class="fact">${why.join(" ")}</p><p class="fact">The ship was insured. Try again, slower.</p>`;
     }
     window.setTimeout(() => {
       showResult($("result"), html, [
-        { label: "Uusi laskeutuminen", onClick: () => this.start(p.id) },
-        { label: "Tähtikartalle", ghost: true, onClick: () => this.cb.toMap() },
+        { label: "Land again", onClick: () => this.start(p.id) },
+        { label: "Back to star map", ghost: true, onClick: () => this.cb.toMap() },
       ]);
     }, L.state === "landed" ? 700 : 1100);
   }
@@ -184,10 +184,10 @@ export class LanderScene implements Scene {
     if (L.y < 0 && L.state === "fly") { x.fillStyle = "#ffb347"; x.fillRect(L.x - 1, 2, 3, 2); }
 
     const lim = this.limits(), f = L.fuel / L.st.tank;
-    $("hud").innerHTML = `<span>POLTTOAINE<span class="fuelbar"><i style="width:${Math.max(0, f * 58)}px;${f < 0.2 ? "background:var(--bad)" : ""}"></i></span></span>
+    $("hud").innerHTML = `<span>FUEL<span class="fuelbar"><i style="width:${Math.max(0, f * 58)}px;${f < 0.2 ? "background:var(--bad)" : ""}"></i></span></span>
       <span class="${L.vy > lim.vy ? "bad" : "good"}">↓ ${fmt1(Math.max(0, L.vy) / G_SCALE)} m/s</span>
       <span class="${Math.abs(L.vx) > lim.vx ? "bad" : "good"}">↔ ${fmt1(Math.abs(L.vx) / G_SCALE)}</span>
       <span class="${Math.abs(L.a) > lim.a ? "bad" : "good"}">∠ ${Math.round(Math.abs(L.a) * 57.3)}°</span>
-      ${p.wind ? `<span>TUULI ${L.wind > 0 ? "→" : "←"}</span>` : ""}`;
+      ${p.wind ? `<span>WIND ${L.wind > 0 ? "→" : "←"}</span>` : ""}`;
   }
 }
